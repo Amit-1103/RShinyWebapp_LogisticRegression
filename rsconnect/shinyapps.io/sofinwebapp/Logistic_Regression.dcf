@@ -1,0 +1,13 @@
+name: Logistic_Regression
+title: Logistic_Regression
+username:
+account: sofinwebapp
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 2908072
+bundleId: 3799466
+url: https://sofinwebapp.shinyapps.io/Logistic_Regression/
+when: 1604036529.30051
+asMultiple: FALSE
+asStatic: FALSE
+ignoredFiles: .RData|Report.pdf

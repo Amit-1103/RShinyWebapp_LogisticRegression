@@ -1,0 +1,190 @@
+---
+title: "Report"
+author: "SOFIN WADHWANIYA"
+date: "27/10/2020"
+output: html_document
+runtime: shiny
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```  
+
+# __Logistic regression__  
+
+
+## ___Report of your Regression Model___  
+
+
+### About Logistic Regression  
+
+
+Logistic Regression, also known as Logit Regression or Logit Model, 
+is a mathematical model used in statistics to estimate (guess) the 
+probability of an event occurring having been given some previous data. 
+Logistic Regression works with binary data, where either the event happens
+(1) or the event does not happen (0).  
+
+
+Like all regression analyses, the logistic regression is a predictive analysis.
+Logistic regression is used to describe data and to explain the relationship 
+between one dependent binary variable and one or more nominal, ordinal, interval
+or ratio-level independent variables.  
+
+
+Here, the response variables can be categorical or continuous, as the model 
+does not strictly require continuous data. To predict group membership, logistic
+regression uses the log odds ratio rather than probabilities and an iterative
+maximum likelihood method rather than a least squares to fit the final model.
+This means the researcher has more freedom when using logistic regression and the method may 
+be more appropriate for non-normally distributed data or when the samples 
+have unequal co-variance matrices.  
+
+
+Thus, Logistic regression models the probabilities for classification 
+problems with two possible outcomes. It's an extension of the linear
+regression model for classification problems.  
+
+
+### Overview of Data  
+
+
+```{r}
+library(DT)
+library(shiny)
+library(shinythemes)
+library(summarytools)
+library(ggplot2)
+library(GGally)
+library(Amelia)
+library(ROCR)
+library(pscl)
+library(caret)
+library(tidyverse)
+library(rmarkdown)
+df <- reactive(read.csv(input$dataset$datapath, header = input$header))
+dtf <- reactive(subset(df(), select = c(input$columns,input$ind_columns)))
+dtf2 <- reactive(na.omit(dtf()))
+dtf3 <- reactive(subset(dtf2(), select = c(input$ind_columns)))
+td <- reactive(read.csv(input$testdata$datapath))
+td2 <- reactive(na.omit(td()))
+head(dtf2())
+```  
+
+
+### Summary of Data  
+
+
+```{r}
+dfSummary(dtf2())
+```  
+
+
+### Structure of Data  
+
+
+```{r}
+str(dtf2())
+```  
+
+
+### Descriptive Statistics  
+
+
+```{r}
+descr(dtf2())
+```  
+
+
+### Pair Plot as Visualisation  
+
+
+```{r}
+ggpairs(dtf2(),aes(colour=as.factor(dtf2()[,input$columns])))
+```  
+
+
+### Regression  
+
+
+#### Model Summary  
+
+
+```{r}
+model <- glm(dtf2()[,input$columns] ~ ., family=binomial(link = "logit"), data=dtf3())
+summary(model)
+```  
+
+
+#### Coefficients  
+
+
+```{r}
+model3 <- glm(dtf2()[,input$columns] ~ ., family=binomial(link = "logit"), data=dtf3())
+model3
+```  
+
+
+#### ANOVA Table  
+
+
+```{r}
+model2 <- glm(dtf2()[,input$columns] ~ ., family=binomial(link = "logit"), data=dtf3())
+anova(model2, test="Chisq")
+```  
+
+
+### Model Assessment on your Test data  
+
+
+#### Confusion Matrix  
+
+
+```{r}
+model5 <- glm(dtf2()[,input$columns] ~ ., family=binomial(link = "logit"), data=dtf3())
+predicted_result <- predict(model5,newdata=td2(),type='response')
+predicted_result2 <- ifelse(predicted_result > 0.5,1,0)
+confusionMatrix(data=as.factor(predicted_result2), reference=as.factor(td2()[,input$columns]))
+```  
+
+
+### Prediction  
+
+
+```{r}
+pre_inp <- reactive(as.numeric(strsplit(input$predict,",")[[1]]))
+pre_inp   # Your input values for prediction
+temp <- dtf3()[1,]
+temp[1,] <- pre_inp()
+pd <- reactive(temp)
+model6 <- glm(dtf2()[,input$columns] ~ ., family=binomial(link = "logit"), data=dtf3())
+predicted_results <- predict(model6,newdata = pd(),type='response')
+predicted_results2 <- ifelse(predicted_results > 0.5,1,0)
+predicted_results2[1]   # Predicted Value
+```  
+
+
+### Performance Instance Plot (True vs False Positive Rate)  
+
+
+```{r}
+model4 <- glm(dtf2()[,input$columns] ~ ., family=binomial(link = "logit"), data=dtf3())
+p <- predict(model4, newdata=td2(), type="response")
+pr <- prediction(p, td2()[,input$columns])
+prf <- performance(pr, measure = "tpr", x.measure = "fpr")
+plot(prf)
+```  
+
+
+### Contact Details  
+
+
+Name: Sofin Wadhwaniya"  
+
+
+Email address: sofinwadhwaniya@gmail.com  
+
+
+
+
+
